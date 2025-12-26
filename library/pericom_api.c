@@ -25,11 +25,14 @@ static char *trim(char *s)
 
 int pericom_initialize(const char* config_file) 
 {
+    int ret = 0;
     const char *path = config_file ? config_file : "pericom.cnf";
     FILE *f = fopen(path, "r");
-    if (!f) {
+    if (!f) 
+    {
         /* Could not open config file */
-        return -1;
+        ret =  PERICOM_ERR_FILE;
+        goto EXIT;
     }
 
     char line[512];
@@ -87,6 +90,68 @@ int pericom_initialize(const char* config_file)
     }
 
     fclose(f);
+EXIT:
+    return (ret);
+}
 
+int pericom_release()
+{
+    memset(&g_pericom_config, 0, sizeof(g_pericom_config));
+    return 0;
+}
+
+int pericom_spi_open(pericom_handle* handle, unsigned int mode, uint32_t max_speed)
+{
+    int ret = 0;
+    spi_t *spi = spi_new();
+    if (!spi) 
+    {
+        ret = PERICOM_ERR_ALLOC;
+        goto EXIT;
+    }
+    if (spi_open(spi, g_pericom_config.spi0_device, mode, max_speed) != 0) 
+    {
+        spi_free(spi);
+        return -1;
+    }
+    *handle = (pericom_handle)spi;
+EXIT:
+    return (ret);
+}
+
+int pericom_spi_close(pericom_handle handle)
+{
+    spi_t *spi = (spi_t *)handle;
+    if (spi_close(spi) != 0) 
+    {
+        ret = PERICOM_ERR_CLOSE_SPI;
+        goto EXIT;
+    }
+    spi_free(spi);
+    return (ret);
+}
+
+int pericom_spi_transfer(pericom_handle handle, const unsigned char* tx_buffer, unsigned char* rx_buffer, int length)
+{
+    if (!handle) 
+    {
+        ret =  PERICOM_ERR_ARG;
+        goto EXIT;
+    }
+    if (tx_buffer == NULL && rx_buffer == NULL) 
+    {
+        ret =  PERICOM_ERR_ARG;
+        goto EXIT;
+    }
+    if (length <= 0) 
+    {
+        ret =  PERICOM_ERR_ARG;
+        goto EXIT;
+    }
+    spi_t *spi = (spi_t *)handle;
+    if (spi_transfer(spi, tx_buffer, rx_buffer, length) != 0) 
+    {
+        return -1;
+    }
     return 0;
 }
