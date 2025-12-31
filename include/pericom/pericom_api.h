@@ -34,7 +34,10 @@ int pericom_spi_close(pericom_handle handle);
 int pericom_spi_transfer(pericom_handle handle, const unsigned char* tx_buffer, unsigned char* rx_buffer, int length);
 
 int pericom_delay(int milliseconds);
-int pericom_low_gpio(int pin);
-int pericom_high_gpio(int pin);
+
+int pericom_gpio_open(pericom_handle* handle, int pin);
+int pericom_gpio_close(pericom_handle handle, int pin);
+int pericom_gpio_low(pericom_handle handle, int pin);
+int pericom_gpio_high(pericom_handle handle, int pin);
 
 #endif /* __PERICOM_API_H__ */

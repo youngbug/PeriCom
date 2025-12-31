@@ -7,6 +7,9 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Define GPIO character device support level
+set(GPIO_CDEV_SUPPORT 2)
+
 # Include path for all targets
 set(PERICOM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PERICOM_INCLUDE_DIR})

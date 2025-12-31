@@ -155,3 +155,23 @@ int pericom_spi_transfer(pericom_handle handle, const unsigned char* tx_buffer, 
     }
     return 0;
 }
+
+int pericom_gpio_open(pericom_handle* handle, int pin)
+{
+    // Implementation for opening GPIO pin
+    int ret = 0;
+    gpio_t *gpio = gpio_new();
+    if (!gpio) 
+    {
+        ret = PERICOM_ERR_ALLOC;
+        goto EXIT;
+    }
+    if (gpio_open(gpio, "/dev/gpiochip0", pin, GPIO_DIR_OUT) != 0) 
+    {
+        gpio_free(gpio);
+        return -1;
+    }
+    *handle = (pericom_handle)gpio; 
+EXIT:
+    return (ret);
+}
